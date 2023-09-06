@@ -1,6 +1,4 @@
 <?php session_start(); ?>
-<?php
-include_once './includes/includes_paths.php'; ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -90,7 +88,7 @@ include_once './includes/includes_paths.php'; ?>
     </style>
 </head>
 <body>
-<?php include "functions/login_modal.php"; ?>
+<?php include "functions/loggin_logout_system/login_modal.php"; ?>
     
     <header>
         <h1>Welcome to My Basic Website</h1>
@@ -104,7 +102,7 @@ include_once './includes/includes_paths.php'; ?>
         <?php
         // Display login or logout link based on session status
         if (isset($_SESSION['username'])) {
-            echo '<a href="logout.php">Logout</a>';
+            echo '<a href="functions/loggin_logout_system/logout.php">Logout</a>';
         } else {
             echo '<a id="loginLink" style="cursor: pointer;">Login</a>';
         }
