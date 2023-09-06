@@ -1,6 +1,7 @@
 <?php
 // Replace with your database connection code
-include "db_connect.php";
+include_once(__DIR__ . "../../../db/db_connect.php");
+global $conn;
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (isset($_GET['thread_id'])) {

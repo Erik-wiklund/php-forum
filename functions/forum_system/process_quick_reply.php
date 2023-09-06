@@ -1,7 +1,9 @@
 <?php
 session_start();
 // Replace with your database connection code
-include "db_connect.php";
+ include_once(__DIR__ . "../../../db/db_connect.php"); 
+
+ global $conn;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['reply_content']) && isset($_POST['reply_id']) && isset($_POST['thread_id'])) {

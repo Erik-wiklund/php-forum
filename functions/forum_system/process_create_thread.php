@@ -1,7 +1,8 @@
-<?php include "db_connect.php" ?>
 
 <?php
 session_start();
+ include_once(__DIR__ . "../../../db/db_connect.php");
+global $conn;
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (isset($_SESSION['ID'])) {
         echo "Session ID is set!";

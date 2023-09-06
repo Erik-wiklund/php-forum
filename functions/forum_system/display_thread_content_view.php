@@ -119,7 +119,9 @@
         }
     </style>
 </head>
-
+<?php include_once(__DIR__ . "../../../db/db_connect.php");
+global $conn;
+?>;
 <body>
     <div class="thread-title"><?php echo $threadRow['thread_title']; ?></div>
     <?php

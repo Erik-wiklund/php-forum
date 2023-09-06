@@ -1,4 +1,5 @@
-<?php session_start(); ?>
+<?php session_start(); 
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -95,8 +96,8 @@
     </header>
 
     <nav>
-        <a href="index.php">Home</a>
-        <a href="forums.php">Forums</a>
+        <a href="./index.php">Home</a>
+        <a href="functions/forum_system/forums.php">Forums</a>
         <a href="#">About</a>
         <a href="#">Contact</a>
         <?php

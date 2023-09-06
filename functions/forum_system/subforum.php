@@ -1,4 +1,4 @@
-<?php include "db_connect.php" ?>
+<?php include_once(__DIR__ . "../../../db/db_connect.php"); ?>;
 <?php session_start(); ?>
 <!DOCTYPE html>
 <html>
@@ -100,6 +100,7 @@
             // Include your database connection here
 
             // Fetch threads
+            global $conn;
             $query = "SELECT threads.*, users.username 
             FROM threads
             INNER JOIN users ON threads.user_id = users.id";

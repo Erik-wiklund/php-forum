@@ -1,6 +1,8 @@
 <?php
 session_start();
-require_once "db_connect.php";
+ include_once(__DIR__ . "../../../db/db_connect.php");
+
+ global $conn;
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (isset($_POST['moderation_action']) && isset($_POST['moderation'])) {

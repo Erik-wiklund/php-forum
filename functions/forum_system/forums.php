@@ -1,5 +1,5 @@
-<?php include "db_connect.php" ?>
-<?php session_start() ?>;
+<?php session_start() ?>
+<?php include_once(__DIR__ . "../../../db/db_connect.php"); ?>;
 <!DOCTYPE html>
 <html>
 
@@ -104,6 +104,7 @@
         <!-- Display Forum Categories -->
         <div class="forum-categories">
             <?php
+            global $conn;
             // Fetch forum categories
             $query = "SELECT * FROM forum_categories";
             $result = mysqli_query($conn, $query);
