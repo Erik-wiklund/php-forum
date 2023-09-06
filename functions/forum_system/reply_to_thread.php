@@ -1,7 +1,8 @@
 <?php
-include "db_connect.php";
 session_start();
+include_once(__DIR__ . "../../../db/db_connect.php"); 
 
+global $conn;
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (isset($_POST['thread_id']) && isset($_POST['reply_content']) && isset($_SESSION['ID'])) {
         $threadId = $_POST['thread_id'];
