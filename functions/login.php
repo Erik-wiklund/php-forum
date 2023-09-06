@@ -1,7 +1,7 @@
 <?php
 session_start();
-
-require_once "db_connect.php";
+include_once './includes/includes_paths.php';
+require_once "../db/db_connect.php";
 
 // Check if the user is already logged in
 if (isset($_SESSION['username'])) {

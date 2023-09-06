@@ -1,15 +1,16 @@
 <?php
 // Start the session to access session variables
 session_start();
+include_once './includes/includes_paths.php';
 
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {
     // If not logged in, redirect to the login page
-    header('Location: login.php');
+    header('Location: ../functions/login.php');
     exit;
 }
 
-require_once "db_connect.php";
+require_once "../db/db_connect.php";
 
 // Display the logged-in user's information
 $username = $_SESSION['username'];
@@ -56,6 +57,6 @@ $storedUserRole = $row['userrole'];
         <p><a href="profile.php">My Profile</a></p>
     <?php } ?>
     
-    <p><a href="logout.php">Logout</a></p>
+    <p><a href="../functions/logout.php">Logout</a></p>
 </body>
 </html>

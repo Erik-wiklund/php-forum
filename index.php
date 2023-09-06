@@ -1,4 +1,6 @@
 <?php session_start(); ?>
+<?php
+include_once './includes/includes_paths.php'; ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -88,7 +90,7 @@
     </style>
 </head>
 <body>
-<?php include "login_modal.php"; ?>
+<?php include "functions/login_modal.php"; ?>
     
     <header>
         <h1>Welcome to My Basic Website</h1>

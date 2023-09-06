@@ -1,3 +1,5 @@
+<?php
+include_once './includes/includes_paths.php'; ?>
 <!-- Modal HTML -->
 <div id="loginModal" class="modal">
     <div class="modal-content">
