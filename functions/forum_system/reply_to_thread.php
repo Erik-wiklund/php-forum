@@ -12,7 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $insertQuery = "INSERT INTO replies (thread_id, user_id, reply_content) VALUES ($threadId, $userId, '$replyContent')";
         if (mysqli_query($conn, $insertQuery)) {
             // Reply added successfully, redirect back to the thread's content page
-            header("Location: display_thread_content.php?thread_id=$threadId");
+            header("Location: display_thread_content_view.php?thread_id=$threadId");
             exit();
         } else {
             echo "Error adding reply: " . mysqli_error($conn);

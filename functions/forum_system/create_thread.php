@@ -1,5 +1,7 @@
-<?php include "db_connect.php" ?>
+
 <?php session_start(); ?>
+<?php include_once(__DIR__ . "../../../db/db_connect.php"); ?>
+
 
 <!DOCTYPE html>
 <html>
@@ -87,7 +89,7 @@
     </header>
 
     <nav>
-        <?php if (isset($_SESSION['id'])): ?>
+        <?php if (isset($_SESSION['ID'])): ?>
         <!-- Navigation links for logged-in users -->
         <a href="#">Home</a>
         <a href="#">Forums</a>

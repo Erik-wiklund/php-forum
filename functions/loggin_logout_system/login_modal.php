@@ -2,6 +2,7 @@
 
 // Modal HTML
 ?>
+<body>
 <div id="loginModal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
@@ -17,4 +18,5 @@
     </div>
 </div>
 
-<script src="../js/login_modal.js"></script>
+<script src="js/login_modal.js"></script>
+</body>

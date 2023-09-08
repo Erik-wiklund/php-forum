@@ -109,7 +109,7 @@
             // Display threads
             while ($row = mysqli_fetch_assoc($result)) {
                 echo '<li class="thread-item">';
-                echo '<h2><a href="display_thread_content.php?thread_id=' . $row['thread_id'] . '">' . $row['thread_title'] . '</a></h2>';
+                echo '<h2><a href="display_thread_content_view.php?thread_id=' . $row['thread_id'] . '">' . $row['thread_title'] . '</a></h2>';
                 echo '<p>' . "Created by" . " " . $row['username'] . '</p>';
                 // Display additional thread information here
                 echo '</li>';

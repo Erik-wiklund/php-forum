@@ -89,7 +89,7 @@
     </style>
 </head>
 <body>
-<?php include "functions/loggin_logout_system/login_modal.php"; ?>
+<?php include "./functions/loggin_logout_system/login_modal.php"; ?>
     
     <header>
         <h1>Welcome to My Basic Website</h1>
