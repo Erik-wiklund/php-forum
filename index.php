@@ -106,9 +106,15 @@
             echo '<a href="includes/logout.php">Logout</a>';
         } else {
             echo '<a id="loginLink" style="cursor: pointer;">Login</a>';
+            echo "<a href='Registration_form.php'>Register</a>";
         }
         ?>
-        <a href="Registration_form.php">Register</a>
+        <?php 
+        if ($_SESSION['user_role'] === 'administrator') {
+            echo "<a href='admin/admin_dashboard.php'>Admin</a>";
+        }
+        ?>
+        
     </nav>
 
     <div class="container">
