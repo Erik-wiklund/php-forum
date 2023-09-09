@@ -108,6 +108,7 @@
             echo '<a id="loginLink" style="cursor: pointer;">Login</a>';
         }
         ?>
+        <a href="Registration_form.php">Register</a>
     </nav>
 
     <div class="container">
