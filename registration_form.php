@@ -1,7 +1,7 @@
 <?php
 // Start the session to access session variables
 session_start();
-require_once "db_connect.php";
+include_once(__DIR__ . "./db/db_connect.php");
 
 $registrationMessage = ""; // Initialize the registration message
 
@@ -17,19 +17,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // Hash the password
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT, ['cost' => 10]);
 
+        // Get the current timestamp as the registration date
+        $registerDate = date('Y-m-d H:i:s');
+
         // Prepare and execute the insert query
-        $insertQuery = "INSERT INTO users (username, password, userrole, firstname, lastname) VALUES (?, ?, ?, ?, ?)";
+        $insertQuery = "INSERT INTO users (username, password, userrole, firstname, lastname, register_date) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = mysqli_prepare($conn, $insertQuery);
-        
+
         if ($stmt) {
-            mysqli_stmt_bind_param($stmt, "sssss", $username, $hashedPassword, $userrole, $firstname, $lastname);
-            
+            mysqli_stmt_bind_param($stmt, "ssssss", $username, $hashedPassword, $userrole, $firstname, $lastname, $registerDate);
+
             if (mysqli_stmt_execute($stmt)) {
                 $registrationMessage = "User has been registered successfully!";
+                // Redirect to a confirmation page or the registration form
+                header("Location: confirmation.php"); // Replace 'confirmation.php' with the desired URL
+                exit(); // Make sure to exit the script after redirection
             } else {
                 $registrationMessage = "Error inserting record: " . mysqli_stmt_error($stmt);
             }
-            
+
             mysqli_stmt_close($stmt);
         } else {
             $registrationMessage = "Prepared statement error: " . mysqli_error($conn);
