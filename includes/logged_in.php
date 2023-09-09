@@ -1,7 +1,7 @@
 <?php
 // Start the session to access session variables
 session_start();
-include_once './includes/includes_paths.php';
+include_once 'includes_paths.php';
 
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {
@@ -10,7 +10,7 @@ if (!isset($_SESSION['username'])) {
     exit;
 }
 
-require_once "db/db_connect.php";
+include_once(__DIR__ . "../../db/db_connect.php");
 
 // Display the logged-in user's information
 $username = $_SESSION['username'];
@@ -50,7 +50,7 @@ $storedUserRole = $row['userrole'];
     <!-- Display menu choices based on user role -->
     <?php if ($storedUserRole === 'administrator') { ?>
         <p><a href="admin_dashboard.php">Admin Dashboard</a></p>
-        <p><a href="manage_users.php">Manage Users</a></p>
+        <p><a href="../admin/includes/manage_users.php">Manage Users</a></p>
         <p><a href="profile.php">My Profile</a></p>
     <?php } else if ($storedUserRole === 'user') { ?>
         <p><a href="user_dashboard.php">User Dashboard</a></p>

@@ -5,12 +5,12 @@ session_start();
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {
     // If not logged in, redirect to the login page
-    header('Location: login.php');
+    header('Location: ../login.php');
     exit;
 }
 
 // Include the database connection
-require_once "db_connect.php";
+ include_once(__DIR__ . "../../../db/db_connect.php");
 
 // Read user data from the database
 $query = "SELECT ID, username, userrole FROM users";

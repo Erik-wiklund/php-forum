@@ -7,7 +7,7 @@
     <div class="modal-content">
         <span class="close">&times;</span>
         <h2>Login</h2>
-        <form id="loginForm" action="functions/loggin_logout_system/login.php" method="post">
+        <form id="loginForm" action="login.php" method="post">
             <label for="login_username">Username:</label>
             <input type="text" name="login_username" id="login_username"><br>
             <label for="login_password">Password:</label>

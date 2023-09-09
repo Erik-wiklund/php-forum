@@ -89,21 +89,21 @@
     </style>
 </head>
 <body>
-<?php include "./functions/loggin_logout_system/login_modal.php"; ?>
+<?php include "includes/login_modal.php"; ?>
     
     <header>
         <h1>Welcome to My Basic Website</h1>
     </header>
 
     <nav>
-        <a href="./index.php">Home</a>
-        <a href="functions/forum_system/forums.php">Forums</a>
+        <a href="index.php">Home</a>
+        <a href="includes/forum_system/forums.php">Forums</a>
         <a href="#">About</a>
         <a href="#">Contact</a>
         <?php
         // Display login or logout link based on session status
         if (isset($_SESSION['username'])) {
-            echo '<a href="functions/loggin_logout_system/logout.php">Logout</a>';
+            echo '<a href="includes/logout.php">Logout</a>';
         } else {
             echo '<a id="loginLink" style="cursor: pointer;">Login</a>';
         }

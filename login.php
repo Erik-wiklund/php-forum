@@ -1,10 +1,10 @@
 <?php
 session_start();
-require_once "../../db/db_connect.php";
+require_once "db/db_connect.php";
 
 // Check if the user is already logged in
 if (isset($_SESSION['username'])) {
-    header('Location: ../../index.php'); // Redirect to the index page if already logged in
+    header('Location: index.php'); // Redirect to the index page if already logged in
     exit;
 }
 
@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["form_submitted"])) {
                 }
         
                 // Reload the page
-                header('Location: ../../index.php');
+                header('Location: index.php');
                 exit;
             } else {
                 $loginError = true;

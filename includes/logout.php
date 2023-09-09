@@ -5,7 +5,7 @@ session_start();
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {
     // If not logged in, redirect to the login page
-    header('Location: index.php');
+    header('Location: ../index.php');
     exit;
 }
 
@@ -25,7 +25,7 @@ if (isset($_GET['logout'])) {
     // Clear any other session-related cookies you may have set
     // For example, if you have set other custom cookies, unset them here using setcookie() with a past expiration time
 
-    header('Location: index.php');
+    header('Location:../index.php');
     exit;
 }
 ?>
@@ -49,6 +49,6 @@ if (isset($_GET['logout'])) {
     <h2>Logout</h2>
     <p>Are you sure you want to log out?</p>
     <p><a href="?logout=1">Yes, Log out</a></p>
-    <p><a href="logged_in.php">No, Go back to the logged-in page</a></p>
+    <p><a href="../includes/logged_in.php">No, Go back to the logged-in page</a></p>
 </body>
 </html>
