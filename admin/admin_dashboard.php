@@ -17,19 +17,94 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['categoryName'])) {
     }
 }
 
-// Handle adding new sub-forum
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['subforumName']) && isset($_POST['categoryID'])) {
-    $subforumName = $_POST['subforumName'];
-    $categoryID = $_POST['categoryID'];
+// Handle editing category
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['editCategoryName']) && isset($_POST['editCategoryID'])) {
+    $editCategoryName = $_POST['editCategoryName'];
+    $editCategoryID = $_POST['editCategoryID'];
 
-    // Insert sub-forum into the database
-    $insertSubforumQuery = "INSERT INTO forums (forum_name, category_id) VALUES ('$subforumName', '$categoryID')";
-    if (mysqli_query($conn, $insertSubforumQuery)) {
-        // Redirect after successful sub-forum addition
+    // Update category in the database
+    $updateQuery = "UPDATE forum_categories SET category_name = '$editCategoryName' WHERE category_id = '$editCategoryID'";
+    if (mysqli_query($conn, $updateQuery)) {
+        // Redirect after successful category edit
         header("Location: admin_dashboard.php");
         exit(); // Important to exit to prevent further execution
     } else {
-        echo "Error adding sub-forum: " . mysqli_error($conn);
+        echo "Error editing category: " . mysqli_error($conn);
+    }
+}
+
+// Handle deleting category
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['deleteCategoryID'])) {
+    $deleteCategoryID = $_POST['deleteCategoryID'];
+
+    // Delete category from the database
+    $deleteQuery = "DELETE FROM forum_categories WHERE category_id = '$deleteCategoryID'";
+    if (mysqli_query($conn, $deleteQuery)) {
+        // Redirect after successful category deletion
+        header("Location: admin_dashboard.php");
+        exit(); // Important to exit to prevent further execution
+    } else {
+        echo "Error deleting category: " . mysqli_error($conn);
+    }
+}
+
+// Handle adding new user
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['username']) && isset($_POST['password']) && isset($_POST['userrole'])) {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $userrole = $_POST['userrole'];
+
+    // Hash the password
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT, ['cost' => 10]);
+
+    // Insert user into the database
+    $insertUserQuery = "INSERT INTO users (username, password, userrole) VALUES ('$username', '$hashedPassword', '$userrole')";
+    if (mysqli_query($conn, $insertUserQuery)) {
+        // Redirect after successful user addition
+        header("Location: admin_dashboard.php");
+        exit(); // Important to exit to prevent further execution
+    } else {
+        echo "Error adding user: " . mysqli_error($conn);
+    }
+}
+
+// Handle editing user
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['editUserID'])) {
+    $editUserID = $_POST['editUserID'];
+    $newUsername = $_POST['editUsername'];
+    $newUserRole = $_POST['editUserRole'];
+
+    // Define other fields you want to edit
+    $newFirstName = $_POST['editFirstName'];
+    $newLastName = $_POST['editLastName'];
+    $newPassword = $_POST['editPassword'];
+    
+    // Hash the new password
+    $hashedNewPassword = password_hash($newPassword, PASSWORD_BCRYPT, ['cost' => 10]);
+
+    // Update user information in the database
+    $updateUserQuery = "UPDATE users SET username = '$newUsername', userrole = '$newUserRole', firstname = '$newFirstName', lastname = '$newLastName', password = '$hashedNewPassword' WHERE ID = '$editUserID'";
+    if (mysqli_query($conn, $updateUserQuery)) {
+        // Redirect after successful user edit
+        header("Location: admin_dashboard.php");
+        exit(); // Important to exit to prevent further execution
+    } else {
+        echo "Error editing user: " . mysqli_error($conn);
+    }
+}
+
+// Handle deleting user
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['deleteUserID'])) {
+    $deleteUserID = $_POST['deleteUserID'];
+
+    // Delete user from the database
+    $deleteUserQuery = "DELETE FROM users WHERE ID = '$deleteUserID'";
+    if (mysqli_query($conn, $deleteUserQuery)) {
+        // Redirect after successful user deletion
+        header("Location: admin_dashboard.php");
+        exit(); // Important to exit to prevent further execution
+    } else {
+        echo "Error deleting user: " . mysqli_error($conn);
     }
 }
 ?>
@@ -56,6 +131,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['subforumName']) && is
         }
 
         .modal-content {
+            display: flex;
+            flex-direction: column;
             background-color: white;
             width: 50%;
             max-width: 400px;
@@ -87,6 +164,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['subforumName']) && is
         }
 
         input[type="text"],
+        input[type="password"],
         select {
             padding: 8px;
             border: 1px solid #ccc;
@@ -94,19 +172,43 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['subforumName']) && is
             margin-bottom: 10px;
         }
 
-        /* Rest of your CSS styles */
-        /* ... */
+        /* Tab styles */
+        .menu {
+            display: flex;
+        }
+
+        .menu-item {
+            padding: 10px;
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            background-color: #ddd;
+        }
+
+        .admin-section {
+            display: none;
+        }
+
+        /* Add more CSS styles as needed */
     </style>
 </head>
 
 <body>
-    <div class="admin-section">
-        <h2>Add New Category</h2>
+    <div class="menu">
+        <div class="menu-item" onclick="showSection('forumManagement')">Forum Management</div>
+        <div class="menu-item" onclick="showSection('userManagement')">User Management</div>
+    </div>
+
+    <div class="admin-section" id="forumManagement">
+        <h2>Forum Management</h2>
+        <!-- Add New Category -->
         <button class="button" onclick="showModal('addCategoryModal')">Add Category</button>
         <!-- Modal for adding category -->
         <div id="addCategoryModal" class="modal">
             <div class="modal-content">
-                <h3>Add New Category</h3>
+                <h3>Add Category</h3>
                 <form action="admin_dashboard.php" method="post">
                     <label for="categoryName">Category Name:</label>
                     <input type="text" id="categoryName" name="categoryName">
@@ -116,83 +218,145 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['subforumName']) && is
             </div>
         </div>
 
-        <h2>Add New Sub-forum</h2>
-        <button class="button" onclick="showModal('addSubforumModal')">Add Sub-forum</button>
-        <!-- Modal for adding sub-forum -->
-        <div id="addSubforumModal" class="modal">
-            <div class="modal-content">
-                <h3>Add New Sub-forum</h3>
-                <form action="admin_dashboard.php" method="post">
-                    <label for="subforumName">Sub-forum Name:</label>
-                    <input type="text" id="subforumName" name="subforumName">
-                    <label for="categoryDropdown">Choose Category:</label>
-                    <select id="categoryDropdown" name="categoryID">
-                        <?php
-                        // Fetch and populate categories from database
-                        $query = "SELECT * FROM forum_categories";
-                        $result = mysqli_query($conn, $query);
+        <!-- Forum List Table -->
+        <h3>Forum List:</h3>
+        <!-- ... (forum list table as before) ... -->
 
-                        while ($row = mysqli_fetch_assoc($result)) {
-                            echo '<option value="' . $row['category_id'] . '">' . $row['category_name'] . '</option>';
-                        }
-                        ?>
-                    </select>
-                    <button class="button" type="submit">Add</button>
-                    <button class="button" onclick="closeModal('addSubforumModal')">Cancel</button>
-                </form>
-            </div>
-        </div>
+        <!-- Add/Edit/Delete Forum Categories -->
+        <h3>Forum Categories:</h3>
+        <table>
+            <tr>
+                <th>Category Name</th>
+                <th>Action</th>
+            </tr>
+            <?php
+            // Fetch and display categories from the database
+            $categoryQuery = "SELECT * FROM forum_categories";
+            $categoryResult = mysqli_query($conn, $categoryQuery);
 
-        <!-- Rest of your content -->
-        <!-- ... -->
-    </div>
+            while ($categoryRow = mysqli_fetch_assoc($categoryResult)) {
+                echo '<tr>';
+                echo '<td>' . $categoryRow['category_name'] . '</td>';
+                echo '<td>';
+                echo '<form action="admin_dashboard.php" method="post">';
+                echo '<input type="hidden" name="editCategoryID" value="' . $categoryRow['category_id'] . '">';
+                echo '<button class="button" type="button" onclick="showModal(\'editCategoryModal' . $categoryRow['category_id'] . '\')">Edit</button>';
+                echo '<button class="button" type="button" onclick="showModal(\'deleteCategoryModal' . $categoryRow['category_id'] . '\')">Delete</button>';
+                echo '</form>';
+                echo '</td>';
+                echo '</tr>';
 
-    <div class="admin-section">
-        <!-- Add Category and Sub-forum buttons and modals here -->
+                // Edit Category Modal
+                echo '<div id="editCategoryModal' . $categoryRow['category_id'] . '" class="modal">';
+                echo '<div class="modal-content">';
+                echo '<h3>Edit Category</h3>';
+                echo '<form action="admin_dashboard.php" method="post">';
+                echo '<input type="hidden" name="editCategoryID" value="' . $categoryRow['category_id'] . '">';
+                echo '<label for="editCategoryName">Category Name:</label>';
+                echo '<input type="text" id="editCategoryName" name="editCategoryName" value="' . $categoryRow['category_name'] . '">';
+                echo '<button class="button" type="submit">Save</button>';
+                echo '<button class="button" onclick="closeModal(\'editCategoryModal' . $categoryRow['category_id'] . '\')">Cancel</button>';
+                echo '</form>';
+                echo '</div>';
+                echo '</div>';
 
-        <h2>Categories and Sub-forums</h2>
-        <?php
-        $categoryQuery = "SELECT * FROM forum_categories";
-        $categoryResult = mysqli_query($conn, $categoryQuery);
-
-        while ($categoryRow = mysqli_fetch_assoc($categoryResult)) {
-            echo '<div class="category">';
-            echo '<h3>' . $categoryRow['category_name'] . '</h3>';
-
-            // Get sub-forums for this category
-            $subforumQuery = "SELECT * FROM forums WHERE category_id = '{$categoryRow['category_id']}'";
-            $subforumResult = mysqli_query($conn, $subforumQuery);
-
-            echo '<ul>';
-            while ($subforumRow = mysqli_fetch_assoc($subforumResult)) {
-                echo '<li>' . $subforumRow['forum_name'] . ' - Permissions: ' . $subforumRow['forum_permissions'] . '</li>';
+                // Delete Category Modal
+                echo '<div id="deleteCategoryModal' . $categoryRow['category_id'] . '" class="modal">';
+                echo '<div class="modal-content">';
+                echo '<h3>Delete Category</h3>';
+                echo '<p>Are you sure you want to delete this category?</p>';
+                echo '<form action="admin_dashboard.php" method="post">';
+                echo '<input type="hidden" name="deleteCategoryID" value="' . $categoryRow['category_id'] . '">';
+                echo '<button class="button" type="submit">Delete</button>';
+                echo '<button class="button" onclick="closeModal(\'deleteCategoryModal' . $categoryRow['category_id'] . '\')">Cancel</button>';
+                echo '</form>';
+                echo '</div>';
+                echo '</div>';
             }
-            echo '</ul>';
-
-            // Edit and Delete buttons
-            echo '<button class="button" onclick="showModal(\'editCategoryModal\')">Edit</button>';
-            echo '<button class="button" onclick="showModal(\'deleteCategoryModal\')">Delete</button>';
-            echo '</div>';
-        }
-        ?>
+            ?>
+        </table>
+        <!-- ... (rest of the Forum Management content) ... -->
     </div>
 
-    <!-- Edit Category Modal -->
-    <div id="editCategoryModal" class="modal">
-        <div class="modal-content">
-            <!-- Form for editing category -->
-            <!-- ... -->
+    <div class="admin-section" id="userManagement">
+        <h2>User Management</h2>
+        <!-- Add New User -->
+        <button class="button" onclick="showModal('addUserModal')">Add User</button>
+        <!-- Modal for adding user -->
+        <div id="addUserModal" class="modal">
+            <!-- ... (similar structure as before for adding user) ... -->
         </div>
+
+        <!-- User List Table -->
+        <h3>User List:</h3>
+        <table>
+            <tr>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Action</th>
+            </tr>
+            <?php
+            // Fetch and display users from the database
+            $userQuery = "SELECT * FROM users";
+            $userResult = mysqli_query($conn, $userQuery);
+
+            while ($userRow = mysqli_fetch_assoc($userResult)) {
+                echo '<tr>';
+                echo '<td>' . $userRow['username'] . '</td>';
+                echo '<td>' . $userRow['userrole'] . '</td>';
+                echo '<td>';
+                echo '<form action="admin_dashboard.php" method="post">';
+                echo '<input type="hidden" name="editUserID" value="' . $userRow['ID'] . '">';
+                echo '<button class="button" type="button" onclick="showModal(\'editUserModal' . $userRow['ID'] . '\')">Edit</button>';
+                echo '<button class="button" type="button" onclick="showModal(\'deleteUserModal' . $userRow['ID'] . '\')">Delete</button>';
+                echo '</form>';
+                echo '</td>';
+                echo '</tr>';
+
+                // Edit User Modal
+                echo '<div id="editUserModal' . $userRow['ID'] . '" class="modal">';
+                echo '<div class="modal-content">';
+                echo '<h3>Edit User</h3>';
+                echo '<form action="admin_dashboard.php" method="post">';
+                echo '<input type="hidden" name="editUserID" value="' . $userRow['ID'] . '">';
+                echo '<label for="editUsername">Username:</label>';
+                echo '<input type="text" id="editUsername" name="editUsername" value="' . $userRow['username'] . '">';
+                echo '<label for="editFirstname">Firstname:</label>';
+                echo '<input type="text" id="editFirstname" name="editFirstname" value="' . $userRow['firstname'] . '">';
+                echo '<label for="editLastname">Lastname:</label>';
+                echo '<input type="text" id="editLastname" name="editLastname" value="' . $userRow['lastname'] . '">';
+                echo '<label for="editPassword">Password:</label>';
+                echo '<input type="password" id="editPassword" name="editPassword" value="' . $userRow['password'] . '">';
+                echo '<label for="editUserRole">Role:</label>';
+                echo '<select id="editUserRole" name="editUserRole">';
+                echo '<option value="user" ' . ($userRow['userrole'] == 'user' ? 'selected' : '') . '>User</option>';
+                echo '<option value="administrator" ' . ($userRow['userrole'] == 'administrator' ? 'selected' : '') . '>Administrator</option>';
+                echo '</select>';
+                echo '<button class="button" type="submit">Save</button>';
+                echo '<button class="button" onclick="closeModal(\'editUserModal' . $userRow['ID'] . '\')">Cancel</button>';
+                echo '</form>';
+                echo '</div>';
+                echo '</div>';
+
+                // Delete User Modal
+                echo '<div id="deleteUserModal' . $userRow['ID'] . '" class="modal">';
+                echo '<div class="modal-content">';
+                echo '<h3>Delete User</h3>';
+                echo '<p>Are you sure you want to delete this user?</p>';
+                echo '<form action="admin_dashboard.php" method="post">';
+                echo '<input type="hidden" name="deleteUserID" value="' . $userRow['ID'] . '">';
+                echo '<button class="button" type="submit">Delete</button>';
+                echo '<button class="button" onclick="closeModal(\'deleteUserModal' . $userRow['ID'] . '\')">Cancel</button>';
+                echo '</form>';
+                echo '</div>';
+                echo '</div>';
+            }
+            ?>
+        </table>
+        <!-- ... (rest of the User Management content) ... -->
     </div>
 
-    <!-- Delete Category Modal -->
-    <div id="deleteCategoryModal" class="modal">
-        <div class="modal-content">
-            <!-- Form for deleting category -->
-            <!-- ... -->
-        </div>
-    </div>
-
+    <!-- JavaScript for showing/hiding modals and sections -->
     <script>
         function showModal(modalId) {
             document.getElementById(modalId).style.display = 'block';
@@ -200,6 +364,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['subforumName']) && is
 
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
+        }
+
+        function showSection(sectionId) {
+            // Hide all admin sections
+            const adminSections = document.querySelectorAll('.admin-section');
+            adminSections.forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // Show the selected section
+            document.getElementById(sectionId).style.display = 'block';
         }
     </script>
 </body>
