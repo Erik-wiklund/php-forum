@@ -35,6 +35,13 @@ $sqlCategory = "CREATE TABLE IF NOT EXISTS category (
     category_name VARCHAR(255) NOT NULL
 )";
 
+$sqlSub_categories = "CREATE TABLE subcategories (
+    subcategory_id INT AUTO_INCREMENT PRIMARY KEY,
+    subcategory_name VARCHAR(255) NOT NULL,
+    category_id INT NOT NULL,
+    FOREIGN KEY (category_id) REFERENCES forum_categories(category_id)
+)";
+
 $sqlReplies = "CREATE TABLE IF NOT EXISTS replies (
     reply_id INT AUTO_INCREMENT PRIMARY KEY,
     thread_id INT NOT NULL,
