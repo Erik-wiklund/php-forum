@@ -13,6 +13,15 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Create the database if it doesn't exist
+$sqlDb = "CREATE DATABASE IF NOT EXISTS $dbName";
+if ($conn->query($sqlDb) === TRUE) {
+    echo "Database created successfully";
+} else {
+    echo "Error creating database: " . $conn->error;
+}
+
+
 // SQL queries to create forum tables
 $sqlForums = "CREATE TABLE IF NOT EXISTS forums (
     forum_id INT AUTO_INCREMENT PRIMARY KEY,
