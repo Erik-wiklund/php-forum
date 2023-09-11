@@ -86,6 +86,49 @@
             font-weight: bold;
             cursor: pointer;
         }
+
+        #myaccountLink {
+            margin-left: auto;
+        }
+
+        /* Dropdown styles */
+.dropdown {
+    float: right;
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown .dropbtn {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.dropdown-content {
+    display: none;
+    /* position: absolute; */
+    background-color: #444;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: white;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #333;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
     </style>
 </head>
 <body>
@@ -96,26 +139,36 @@
     </header>
 
     <nav>
-        <a href="index.php">Home</a>
-        <a href="includes/forum_system/forums.php">Forums</a>
-        <a href="#">About</a>
-        <a href="#">Contact</a>
+    <a href="index.php">Home</a>
+    <a href="includes/forum_system/forums.php">Forums</a>
+    <a href="#">About</a>
+    <a href="#">Contact</a>
+
+    <div class="dropdown">
         <?php
         // Display login or logout link based on session status
-        if (isset($_SESSION['username'])) {
+        if (isset($_SESSION['username']) ) {
+            $username = $_SESSION['username'];
+            echo '<span class="dropbtn">' . $username . '</span>';
+            echo '<div class="dropdown-content">';
+            echo '<a href="includes/myaccount.php">My Account</a>';
+            if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'administrator') {
+                echo "<a href='admin/admin_dashboard.php'>Admin</a>";
+            }
             echo '<a href="includes/logout.php">Logout</a>';
+            echo '</div>';
         } else {
             echo '<a id="loginLink" style="cursor: pointer;">Login</a>';
             echo "<a href='Registration_form.php'>Register</a>";
         }
         ?>
+
         <?php 
-        if ($_SESSION['user_role'] === 'administrator') {
-            echo "<a href='admin/admin_dashboard.php'>Admin</a>";
-        }
-        ?>
         
-    </nav>
+        ?>
+    </div>
+</nav>
+
 
     <div class="container">
         <h2>Welcome to Our Website</h2>
