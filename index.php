@@ -93,7 +93,8 @@
 
         /* Dropdown styles */
 .dropdown {
-    float: right;
+    margin-left: 70%;
+    /* float: right; */
     position: relative;
     display: inline-block;
 }
@@ -107,7 +108,7 @@
 
 .dropdown-content {
     display: none;
-    /* position: absolute; */
+    position: absolute;
     background-color: #444;
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
