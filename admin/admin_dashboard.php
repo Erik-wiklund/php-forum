@@ -4,6 +4,7 @@ include_once(__DIR__ . "../../db/db_connect.php");
 include_once(__DIR__ . "../../functions/functions.php");
 
 add_new_forum_category();
+edit_forum_category();
 delete_forum_category();
 add_new_forum_subcategory();
 delete_forum_subcategory();
@@ -108,8 +109,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['deleteUserID'])) {
                 <form action="admin_dashboard.php" method="post">
                     <label for="categoryName">Category Name:</label>
                     <input type="text" id="categoryName" name="categoryName">
-                    <label for="categoryOrder">Category Order:</label>
-                    <input type="number" name="categoryOrder">
                     <button class="button" type="submit">Add</button>
                     <button class="button" onclick="closeModal('addCategoryModal')">Cancel</button>
                 </form>
@@ -144,27 +143,38 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['deleteUserID'])) {
                 while ($subcategoryRow = mysqli_fetch_assoc($subcategoryResult)) {
                     echo '<div>';
                     echo '&emsp;&emsp;' . $subcategoryRow['subcategory_name'];
-            
-                      edit_forum_subcategory_modal();   
-                      echo '<button class="button" type="button" onclick="showModal(\'editSubcategoryModal' . $subcategoryRow['category_id'] .  '\')">Edit</button>';               
-                      echo '<button class="button" type="button" onclick="showModal(\'deleteSubcategoryModal' . $subcategoryRow['subcategory_id'] . '\')">Delete</button>';    
-                     echo '</div>';
-                      add_new_subcategory_modal();  
+            ?>
+                    <a class="button" href="includes/edit_sub_category.php?subcategory_id=<?php echo $subcategoryRow['subcategory_id'] ?>">Edit</a> <?php
+                     echo '<button class="button" type="button" onclick="showModal(\'deleteSubcategoryModal' . $subcategoryRow['subcategory_id'] . '\')">Delete</button>';                              echo '</div>';
+                      add_new_subcategory_modal();                    
                 }
                 delete_subcategory_modal();
 
                 echo '</td>';
                 echo '<td>';
-                
-                edit_forum_category($categoryRow['category_id']);
+                echo '<form action="admin_dashboard.php" method="post">';
+                echo '<input type="hidden" name="editCategoryID" value="' . $categoryRow['category_id'] . '">';
+                // Inside your existing loop for displaying categories
                 echo '<button class="button" type="button" onclick="showModal(\'editCategoryModal' . $categoryRow['category_id'] . '\')">Edit</button>';
-                
                 echo '<button class="button" type="button" onclick="showModal(\'deleteCategoryModal' . $categoryRow['category_id'] . '\')">Delete</button>';
 
                 echo '</form>';
                 echo '</td>';
                 echo '</tr>';
-                
+
+                // Inside your loop for displaying categories
+                echo '<div id="editCategoryModal' . $categoryRow['category_id'] . '" class="modal">';
+                echo '<div class="modal-content">';
+                echo '<h3>Edit Category</h3>';
+                echo '<form action="admin_dashboard.php" method="post">';
+                echo '<input type="hidden" name="editSubcategoryID" value="' . $categoryRow['category_id'] . '">';
+                echo '<label for="editCategoryName">Category Name:</label>';
+                echo '<input type="text" name="editCategoryName" value="' . $categoryRow['category_name'] . '">';
+                echo '<button class="button" type="submit">Save</button>';
+                echo '<button class="button" onclick="closeModal(\'editCategoryModal' . $categoryRow['category_id'] . '\')">Cancel</button>';
+                echo '</form>';
+                echo '</div>';
+                echo '</div>';
 
                 // Inside your loop for displaying categories
                 echo '<div id="deleteCategoryModal' . $categoryRow['category_id'] . '" class="modal">';
@@ -275,10 +285,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['deleteUserID'])) {
         }
 
         // Function to show the edit subcategory modal
-        // function showModal(modalId) {
-        //     // Redirect to edit_sub_category.php with subcategoryId as a query parameter
-        //     window.location.href = 'edit_sub_category.php?subcategoryId=' + modalId.substring('editSubcategoryModal'.length);
-        // }
+        function showModal(modalId) {
+            // Redirect to edit_sub_category.php with subcategoryId as a query parameter
+            window.location.href = 'edit_sub_category.php?subcategoryId=' + modalId.substring('editSubcategoryModal'.length);
+        }
 
 
         function showSection(sectionId) {
@@ -292,9 +302,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['deleteUserID'])) {
             document.getElementById(sectionId).style.display = 'block';
         }
         // Function to show the edit category modal
-        function showEditCategoryModal(categoryId) {
-            showModal('editCategoryModal' + categoryId);
-        }
+        // function showEditCategoryModal(categoryId) {
+        //     showModal('editCategoryModal' + categoryId);
+        // }
 
         // Function to show the delete category modal
         function showDeleteCategoryModal(categoryId) {
@@ -305,10 +315,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['deleteUserID'])) {
         // Function to show the delete subcategory modal
         function showDeleteSubcategoryModal(subcategoryId) {
             showModal('deleteSubcategoryModal' + subcategoryId);
-        }
-
-        function showEditSubcategoryModal(subcategoryId) {
-            showModal('editSubcategoryModal' + subcategoryId);
         }
                 function showModal(modalId) {
             console.log("Showing modal with ID:", modalId);
