@@ -61,9 +61,10 @@ function add_new_forum_category()
     // Handle adding new category
     if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['categoryName'])) {
         $categoryName = $_POST['categoryName'];
+        $categoryOrder = $_POST['categoryOrder'];
 
         // Insert category into the database
-        $insertQuery = "INSERT INTO forum_categories (category_name) VALUES ('$categoryName')";
+        $insertQuery = "INSERT INTO forum_categories (category_name,category_order) VALUES ('$categoryName', '$categoryOrder')";
         if (mysqli_query($conn, $insertQuery)) {
             // Redirect after successful category addition
             header("Location: admin_dashboard.php");
@@ -74,25 +75,74 @@ function add_new_forum_category()
     }
 }
 
-function edit_forum_category()
-{
-    // Handle editing category
-    global $conn;
-    if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['editCategoryName']) && isset($_POST['editCategoryID'])) {
-        $editCategoryName = $_POST['editCategoryName'];
-        $editCategoryID = $_POST['editCategoryID'];
 
-        // Update category in the database
-        $updateQuery = "UPDATE forum_categories SET category_name = '$editCategoryName' WHERE category_id = '$editCategoryID'";
-        if (mysqli_query($conn, $updateQuery)) {
-            // Redirect after successful category edit
-            header("Location: admin_dashboard.php");
-            exit(); // Important to exit to prevent further execution
+
+
+
+function edit_forum_category($categoryId)
+{
+    global $conn;
+    $query = "SELECT category_id, category_name, category_order FROM forum_categories";
+    $result = mysqli_query($conn, $query);
+
+    if (!$result) {
+        echo "Error fetching categories: " . mysqli_error($conn);
+        exit;
+    }
+
+
+    while ($categoryRow = mysqli_fetch_assoc($result)) {
+        $catToEdit = $categoryRow['category_id'];
+        $catNameEdit = $categoryRow['category_name'];
+        $catOrderEdit = $categoryRow['category_order'];
+        ?>
+        
+        <!-- Modal for editing this category -->
+        <div class="modal" id="editCategoryModal<?php echo $catToEdit; ?>">
+            <div class="modal-content">
+                <h3>Edit Category</h3>
+                <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+                    <label for="editCategoryName">Category Name:</label>
+                    <input type="text" name="editCategoryName" value="<?php echo $catNameEdit; ?>" required>
+
+                    <label for="editCategoryOrder">Category Order:</label>
+                    <input type="number" name="editCategoryOrder" value="<?php echo $catOrderEdit; ?>" required>
+
+                    <input type="hidden" name="categoryId" value="<?php echo $catToEdit; ?>">
+
+                    <button class="button" type="submit" name="savecatEdit">Save</button>
+                    <button class="button" onclick="closeModal('editCategoryModal<?php echo $catToEdit; ?>')">Cancel</button>
+                </form>
+            </div>
+        </div>
+        <?php
+    }
+    
+
+    if (isset($_POST['savecatEdit'])) {
+        // Get the submitted form data
+        $editcategoryName = $_POST['editCategoryName'];
+        $editcategoryOrder = $_POST['editCategoryOrder'];
+        $categoryId = $_POST['categoryId'];
+
+        // You should validate and sanitize user inputs to prevent SQL injection here.
+
+        // Update category information in the database (corrected SQL query)
+        $updatecategoryQuery = "UPDATE forum_categories SET category_name = '$editcategoryName', category_order = '$editcategoryOrder' WHERE category_id = '$categoryId'";
+
+        if (mysqli_query($conn, $updatecategoryQuery)) {
+            // Category data updated successfully!
+            // You can add a success message here if needed.
         } else {
-            echo "Error editing category: " . mysqli_error($conn);
+            $error_message = "Error editing category: " . mysqli_error($conn);
+            error_log($error_message); // Log the error message
         }
     }
 }
+
+
+
+
 
 function delete_forum_category()
 {
@@ -154,29 +204,6 @@ function delete_forum_subcategory()
     }
 }
 
-function edit_forum_subcategory($subcategoryId)
-{
-    global $conn;
-    // Handle editing subcategory
-    if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['editSubcategoryName']) && isset($_POST['editSubcategoryOrder']) && isset($_POST['editCategorySelect'])) {
-        $editSubcategoryName = $_POST['editSubcategoryName'];
-        $editSubcategoryOrder = $_POST['editSubcategoryOrder'];
-        $editCategorySelect = $_POST['editCategorySelect'];
-
-        // Update subcategory information in the database
-        $updateSubcategoryQuery = "UPDATE subcategories SET subcategory_name = '$editSubcategoryName', subcategory_order = '$editSubcategoryOrder', category_id = '$editCategorySelect' WHERE subcategory_id = '$subcategoryId'";
-
-        if (mysqli_query($conn, $updateSubcategoryQuery)) {
-            // Redirect after successful subcategory edit
-            header("Location: admin_dashboard.php");
-            exit(); // Important to exit to prevent further execution
-        } else {
-            $error_message = "Error editing subcategory: " . mysqli_error($conn);
-            error_log($error_message); // Log the error message
-        }
-    }
-}
-
 
 
 
@@ -221,25 +248,32 @@ function add_new_subcategory_modal()
 }
 
 
-function edit_forum_subcategory_modal($subcategoryId)
+function edit_forum_subcategory_modal()
 {
     global $conn;
-    $modalId = 'editSubcategoryModal' . $subcategoryId;
-
-    // Fetch and display subcategory information for the specified subcategoryId
-    $subcategoryQuery = "SELECT * FROM subcategories WHERE subcategory_id = $subcategoryId";
-    $subcategoryResult = mysqli_query($conn, $subcategoryQuery);
-    $subcategoryRow = mysqli_fetch_assoc($subcategoryResult);
-
-    if ($subcategoryRow) { ?>
-
-        <div id="<?php echo $modalId; ?>" class="modal">
+    $query = "SELECT subcategory_id, subcategory_name, subcategory_order, category_id FROM subcategories";
+    $result = mysqli_query($conn, $query);
+    
+    if (!$result) {
+        echo "Error fetching subcategories: " . mysqli_error($conn);
+        exit;
+    }
+    
+    while ($subcategoryRow = mysqli_fetch_assoc($result)) {
+        $subcatToEdit = $subcategoryRow['subcategory_id'];
+        $subcatNameEdit = $subcategoryRow['subcategory_name'];
+        $subcatOrderEdit = $subcategoryRow['subcategory_order'];
+        $subcatCategoryEdit = $subcategoryRow['category_id'];
+    ?>
+            
+        <!-- Modal for editing subcategory -->
+        <div class="modal" id="editSubcategoryModal<?php echo $subcatToEdit; ?>">
             <div class="modal-content">
                 <h3>Edit Subcategory</h3>
-                <form action="admin_dashboard.php" method="post">
+                <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
                     <label for="editSubCategoryName">Subcategory Name:</label>
-                    <input type="text" name="editSubCategoryName" value="<?php echo $subcategoryRow['subcategory_name']; ?>" required>
-
+                    <input type="text" name="editSubCategoryName" value="<?php echo $subcatNameEdit; ?>" required>
+    
                     <!-- Select Category for the new subcategory -->
                     <label for="editCategorySelect">Select Category:</label>
                     <select name="editCategorySelect" required>
@@ -247,34 +281,61 @@ function edit_forum_subcategory_modal($subcategoryId)
                         // Fetch and display category options
                         $categoryOptionsQuery = "SELECT * FROM forum_categories";
                         $categoryOptionsResult = mysqli_query($conn, $categoryOptionsQuery);
-
+    
                         while ($categoryOptionRow = mysqli_fetch_assoc($categoryOptionsResult)) {
-                            $selected = ($categoryOptionRow['category_id'] == $subcategoryRow['category_id']) ? 'selected' : '';
+                            $selected = ($categoryOptionRow['category_id'] == $subcatCategoryEdit) ? 'selected' : '';
                             echo '<option value="' . $categoryOptionRow['category_id'] . '" ' . $selected . '>'
                                 . $categoryOptionRow['category_name'] . '</option>';
                         }
                         ?>
                     </select>
-
+    
                     <label for="editSubcategoryOrder">Subcategory Order:</label>
-                    <input type="number" name="editSubcategoryOrder" value="<?php echo $subcategoryRow['subcategory_order']; ?>" required>
-
-
-                    <button class="button" type="submit">Save</button>
-                    <button class="button" onclick="closeModal('<?php echo $modalId; ?>')">Cancel</button>
+                    <input type="number" name="editSubcategoryOrder" value="<?php echo $subcatOrderEdit; ?>" required>
+    
+                    <input type="hidden" name="subcategoryId" value="<?php echo $subcatToEdit; ?>">
+    
+                    <button class="button" type="submit" name="saveEdit">Save</button>
+                    <button class="button" onclick="closeModal('editSubcategoryModal<?php echo $subcatToEdit; ?>')">Cancel</button>
                 </form>
             </div>
         </div>
-<?php
+    <?php
     }
+    ?>
+    
+    <?php
+    if (isset($_POST['saveEdit'])) {
+        // Get the submitted form data
+        $editSubcategoryName = $_POST['editSubCategoryName'];
+        $editSubcategoryOrder = $_POST['editSubcategoryOrder'];
+        $editCategorySelect = $_POST['editCategorySelect'];
+        $subcategoryId = $_POST['subcategoryId'];
+    
+        // You should validate and sanitize user inputs to prevent SQL injection here.
+    
+        // Update subcategory information in the database
+        $updateSubcategoryQuery = "UPDATE subcategories SET subcategory_name = '$editSubcategoryName', subcategory_order = '$editSubcategoryOrder', category_id = '$editCategorySelect' WHERE subcategory_id = '$subcategoryId'";
+    
+        if (mysqli_query($conn, $updateSubcategoryQuery)) {
+            // Subcategory data updated successfully!
+            // You can add a success message here if needed.
+        } else {
+            $error_message = "Error editing subcategory: " . mysqli_error($conn);
+            error_log($error_message); // Log the error message
+        }
+    }
+    
+    
 }
+
 function delete_subcategory_modal()
 {
     global $conn;
     $categoryQuery = "SELECT * FROM forum_categories";
     $categoryResult = mysqli_query($conn, $categoryQuery);
     while ($categoryRow = mysqli_fetch_assoc($categoryResult)) {
-        
+
         $subcategoryQuery = "SELECT * FROM subcategories WHERE category_id = " . $categoryRow['category_id'];
         $subcategoryResult = mysqli_query($conn, $subcategoryQuery);
 
