@@ -145,8 +145,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['deleteUserID'])) {
                     echo '<div>';
                     echo '&emsp;&emsp;' . $subcategoryRow['subcategory_name'];
             
-                      edit_forum_subcategory_modal();   
-                      echo '<button class="button" type="button" onclick="showModal(\'editSubcategoryModal' . $subcategoryRow['category_id'] .  '\')">Edit</button>';               
+                      edit_forum_subcategory_modal($subcategoryRow['subcategory_id']);   
+                      echo '<button class="button" type="button" onclick="showModal(\'editSubcategoryModal' . $subcategoryRow['subcategory_id'] .  '\')">Edit</button>';               
                       echo '<button class="button" type="button" onclick="showModal(\'deleteSubcategoryModal' . $subcategoryRow['subcategory_id'] . '\')">Delete</button>';    
                      echo '</div>';
                       add_new_subcategory_modal();  
