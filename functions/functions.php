@@ -55,7 +55,7 @@ function login_user($username, $password)
 
 // Forum querys
 
-function add_new_forum_category()
+function add_new_forum_category_query()
 {
     global $conn;
     // Handle adding new category
@@ -95,8 +95,8 @@ function edit_forum_category($categoryId)
         $catToEdit = $categoryRow['category_id'];
         $catNameEdit = $categoryRow['category_name'];
         $catOrderEdit = $categoryRow['category_order'];
-        ?>
-        
+?>
+
         <!-- Modal for editing this category -->
         <div class="modal" id="editCategoryModal<?php echo $catToEdit; ?>">
             <div class="modal-content">
@@ -115,9 +115,9 @@ function edit_forum_category($categoryId)
                 </form>
             </div>
         </div>
-        <?php
+    <?php
     }
-    
+
 
     if (isset($_POST['savecatEdit'])) {
         // Get the submitted form data
@@ -144,7 +144,7 @@ function edit_forum_category($categoryId)
 
 
 
-function delete_forum_category()
+function delete_forum_category_query()
 {
     global $conn;
     // Handle deleting category
@@ -163,7 +163,7 @@ function delete_forum_category()
     }
 }
 
-function add_new_forum_subcategory()
+function add_new_forum_subcategory_query()
 {
     global $conn;
 
@@ -185,7 +185,7 @@ function add_new_forum_subcategory()
     }
 }
 
-function delete_forum_subcategory()
+function delete_forum_subcategory_query()
 {
     global $conn;
     // Handle deleting category
@@ -208,6 +208,47 @@ function delete_forum_subcategory()
 
 
 // Modals
+
+function add_new_category_modal()
+{
+    ?>
+    <div id="addCategoryModal" class="modal">
+        <div class="modal-content">
+            <h3>Add Category</h3>
+            <form action="admin_dashboard.php" method="post">
+                <label for="categoryName">Category Name:</label>
+                <input type="text" id="categoryName" name="categoryName">
+                <label for="categoryOrder">Category Order:</label>
+                <input type="number" name="categoryOrder">
+                <button class="button" type="submit">Add</button>
+                <button class="button" onclick="closeModal('addCategoryModal')">Cancel</button>
+            </form>
+        </div>
+    </div>
+<?php
+}
+
+function delete_forum_category_modal()
+{
+    global $conn;
+
+    $categoryQuery = "SELECT * FROM forum_categories";
+    $categoryResult = mysqli_query($conn, $categoryQuery);
+    while ($categoryRow = mysqli_fetch_assoc($categoryResult)) {
+
+        echo '<div id="deleteCategoryModal' . $categoryRow['category_id'] . '" class="modal">';
+        echo '<div class="modal-content">';
+        echo '<h3>Delete Category</h3>';
+        echo '<p>Are you sure you want to delete this category?</p>';
+        echo '<form action="admin_dashboard.php" method="post">';
+        echo '<input type="hidden" name="deleteCategoryID" value="' . $categoryRow['category_id'] . '">';
+        echo '<button class="button" type="submit">Delete</button>';
+        echo '<button class="button" onclick="closeModal(\'deleteCategoryModal' . $categoryRow['category_id'] . '\')">Cancel</button>';
+        echo '</form>';
+        echo '</div>';
+        echo '</div>';
+    }
+}
 
 function add_new_subcategory_modal()
 {
@@ -253,19 +294,19 @@ function edit_forum_subcategory_modal()
     global $conn;
     $query = "SELECT subcategory_id, subcategory_name, subcategory_order, category_id FROM subcategories";
     $result = mysqli_query($conn, $query);
-    
+
     if (!$result) {
         echo "Error fetching subcategories: " . mysqli_error($conn);
         exit;
     }
-    
+
     while ($subcategoryRow = mysqli_fetch_assoc($result)) {
         $subcatToEdit = $subcategoryRow['subcategory_id'];
         $subcatNameEdit = $subcategoryRow['subcategory_name'];
         $subcatOrderEdit = $subcategoryRow['subcategory_order'];
         $subcatCategoryEdit = $subcategoryRow['category_id'];
     ?>
-            
+
         <!-- Modal for editing subcategory -->
         <div class="modal" id="editSubcategoryModal<?php echo $subcatToEdit; ?>">
             <div class="modal-content">
@@ -273,7 +314,7 @@ function edit_forum_subcategory_modal()
                 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
                     <label for="editSubCategoryName">Subcategory Name:</label>
                     <input type="text" name="editSubCategoryName" value="<?php echo $subcatNameEdit; ?>" required>
-    
+
                     <!-- Select Category for the new subcategory -->
                     <label for="editCategorySelect">Select Category:</label>
                     <select name="editCategorySelect" required>
@@ -281,7 +322,7 @@ function edit_forum_subcategory_modal()
                         // Fetch and display category options
                         $categoryOptionsQuery = "SELECT * FROM forum_categories";
                         $categoryOptionsResult = mysqli_query($conn, $categoryOptionsQuery);
-    
+
                         while ($categoryOptionRow = mysqli_fetch_assoc($categoryOptionsResult)) {
                             $selected = ($categoryOptionRow['category_id'] == $subcatCategoryEdit) ? 'selected' : '';
                             echo '<option value="' . $categoryOptionRow['category_id'] . '" ' . $selected . '>'
@@ -289,12 +330,12 @@ function edit_forum_subcategory_modal()
                         }
                         ?>
                     </select>
-    
+
                     <label for="editSubcategoryOrder">Subcategory Order:</label>
                     <input type="number" name="editSubcategoryOrder" value="<?php echo $subcatOrderEdit; ?>" required>
-    
+
                     <input type="hidden" name="subcategoryId" value="<?php echo $subcatToEdit; ?>">
-    
+
                     <button class="button" type="submit" name="saveEdit">Save</button>
                     <button class="button" onclick="closeModal('editSubcategoryModal<?php echo $subcatToEdit; ?>')">Cancel</button>
                 </form>
@@ -303,20 +344,20 @@ function edit_forum_subcategory_modal()
     <?php
     }
     ?>
-    
-    <?php
+
+<?php
     if (isset($_POST['saveEdit'])) {
         // Get the submitted form data
         $editSubcategoryName = $_POST['editSubCategoryName'];
         $editSubcategoryOrder = $_POST['editSubcategoryOrder'];
         $editCategorySelect = $_POST['editCategorySelect'];
         $subcategoryId = $_POST['subcategoryId'];
-    
+
         // You should validate and sanitize user inputs to prevent SQL injection here.
-    
+
         // Update subcategory information in the database
         $updateSubcategoryQuery = "UPDATE subcategories SET subcategory_name = '$editSubcategoryName', subcategory_order = '$editSubcategoryOrder', category_id = '$editCategorySelect' WHERE subcategory_id = '$subcategoryId'";
-    
+
         if (mysqli_query($conn, $updateSubcategoryQuery)) {
             // Subcategory data updated successfully!
             // You can add a success message here if needed.
@@ -325,8 +366,6 @@ function edit_forum_subcategory_modal()
             error_log($error_message); // Log the error message
         }
     }
-    
-    
 }
 
 function delete_subcategory_modal()

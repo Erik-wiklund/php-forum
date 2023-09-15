@@ -3,10 +3,10 @@
 include_once(__DIR__ . "../../db/db_connect.php");
 include_once(__DIR__ . "../../functions/functions.php");
 
-add_new_forum_category();
-delete_forum_category();
-add_new_forum_subcategory();
-delete_forum_subcategory();
+add_new_forum_category_query();
+delete_forum_category_query();
+add_new_forum_subcategory_query();
+delete_forum_subcategory_query();
 
 // Handle adding new user
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['username']) && isset($_POST['password']) && isset($_POST['userrole'])) {
@@ -68,15 +68,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['deleteUserID'])) {
     }
 }
 
-
-
-?>
-
-<!-- Add/Edit/Delete Subcategories -->
-<?php
-
-
-
 ?>
 
 <!DOCTYPE html>
@@ -101,27 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['deleteUserID'])) {
             <button class="button" onclick="showModal('addCategoryModal')">Add Category</button>
             <button class="button" onclick="showModal('addSubCategoryModal')">Add Subcategory</button>
         </div>
-        <!-- Modal for adding category -->
-        <div id="addCategoryModal" class="modal">
-            <div class="modal-content">
-                <h3>Add Category</h3>
-                <form action="admin_dashboard.php" method="post">
-                    <label for="categoryName">Category Name:</label>
-                    <input type="text" id="categoryName" name="categoryName">
-                    <label for="categoryOrder">Category Order:</label>
-                    <input type="number" name="categoryOrder">
-                    <button class="button" type="submit">Add</button>
-                    <button class="button" onclick="closeModal('addCategoryModal')">Cancel</button>
-                </form>
-            </div>
-        </div>
-        <!-- Edit SubCategory Modal -->
-        <!-- Modal for editing subcategory -->
 
-
-
-
-        <h3>Forum:</h3>
         <table>
             <tr class="tag-names">
                 <th>Category Name</th>
@@ -130,7 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['deleteUserID'])) {
             </tr>
             <?php
             // Fetch and display categories from the database
-            $categoryQuery = "SELECT * FROM forum_categories";
+            $categoryQuery = "SELECT * FROM forum_categories ORDER BY category_order";
             $categoryResult = mysqli_query($conn, $categoryQuery);
 
             while ($categoryRow = mysqli_fetch_assoc($categoryResult)) {
@@ -138,46 +109,37 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['deleteUserID'])) {
                 echo '<td>' . $categoryRow['category_name'] . '</td>';
                 echo '<td>';
                 // Fetch and display subcategories for the current category
-                $subcategoryQuery = "SELECT * FROM subcategories WHERE category_id = " . $categoryRow['category_id'];
+                $subcategoryQuery = "SELECT sub.* FROM subcategories sub 
+                JOIN forum_categories cat ON sub.category_id = cat.category_id
+                WHERE cat.category_id = " . $categoryRow['category_id'] . "
+                ORDER BY sub.subcategory_order";
                 $subcategoryResult = mysqli_query($conn, $subcategoryQuery);
-
+                add_new_category_modal();
                 while ($subcategoryRow = mysqli_fetch_assoc($subcategoryResult)) {
                     echo '<div>';
                     echo '&emsp;&emsp;' . $subcategoryRow['subcategory_name'];
-            
-                      edit_forum_subcategory_modal($subcategoryRow['subcategory_id']);   
-                      echo '<button class="button" type="button" onclick="showModal(\'editSubcategoryModal' . $subcategoryRow['subcategory_id'] .  '\')">Edit</button>';               
-                      echo '<button class="button" type="button" onclick="showModal(\'deleteSubcategoryModal' . $subcategoryRow['subcategory_id'] . '\')">Delete</button>';    
-                     echo '</div>';
-                      add_new_subcategory_modal();  
+
+                    edit_forum_subcategory_modal($subcategoryRow['subcategory_id']);
+                    echo '<button class="button" type="button" onclick="showModal(\'editSubcategoryModal' . $subcategoryRow['subcategory_id'] .  '\')">Edit</button>';
+                    echo '<button class="button" type="button" onclick="showModal(\'deleteSubcategoryModal' . $subcategoryRow['subcategory_id'] . '\')">Delete</button>';
+                    echo '</div>';
+                    add_new_subcategory_modal();
                 }
                 delete_subcategory_modal();
+                delete_forum_category_modal();
 
                 echo '</td>';
                 echo '<td>';
-                
+
                 edit_forum_category($categoryRow['category_id']);
                 echo '<button class="button" type="button" onclick="showModal(\'editCategoryModal' . $categoryRow['category_id'] . '\')">Edit</button>';
-                
+
                 echo '<button class="button" type="button" onclick="showModal(\'deleteCategoryModal' . $categoryRow['category_id'] . '\')">Delete</button>';
 
                 echo '</form>';
                 echo '</td>';
                 echo '</tr>';
                 
-
-                // Inside your loop for displaying categories
-                echo '<div id="deleteCategoryModal' . $categoryRow['category_id'] . '" class="modal">';
-                echo '<div class="modal-content">';
-                echo '<h3>Delete Category</h3>';
-                echo '<p>Are you sure you want to delete this category?</p>';
-                echo '<form action="admin_dashboard.php" method="post">';
-                echo '<input type="hidden" name="deleteCategoryID" value="' . $categoryRow['category_id'] . '">';
-                echo '<button class="button" type="submit">Delete</button>';
-                echo '<button class="button" onclick="closeModal(\'deleteCategoryModal' . $categoryRow['category_id'] . '\')">Cancel</button>';
-                echo '</form>';
-                echo '</div>';
-                echo '</div>';
             }
             ?>
         </table>
@@ -310,7 +272,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['deleteUserID'])) {
         function showEditSubcategoryModal(subcategoryId) {
             showModal('editSubcategoryModal' + subcategoryId);
         }
-                function showModal(modalId) {
+
+        function showModal(modalId) {
             console.log("Showing modal with ID:", modalId);
             const modal = document.getElementById(modalId);
             if (modal) {
