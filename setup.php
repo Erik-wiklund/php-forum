@@ -70,6 +70,22 @@ $sqlUsers = "CREATE TABLE IF NOT EXISTS users (
     register_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 )";
 
+$sqlInsertAdmin = "INSERT INTO users (
+    username,
+     password,
+      userrole)
+       VALUES 
+       (
+        'admin',
+         'admin',
+          'administrator')";
+
+if (mysqli_query($conn, $sqlInsertAdmin)) {
+    echo "Admin user added successfully";
+} else {
+    echo "Error adding admin user: " . mysqli_error($conn);
+}
+
 // Execute the queries
 if ($conn->query($sqlForums) === TRUE) {
     echo "Forums table created successfully<br>";
