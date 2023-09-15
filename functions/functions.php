@@ -142,6 +142,22 @@ function edit_forum_category($categoryId)
 
 
 
+function hasSubcategories($categoryID) {
+    global $conn;
+
+    $query = "SELECT COUNT(*) FROM subcategories WHERE category_id = '$categoryID'";
+    $result = mysqli_query($conn, $query);
+
+    if (!$result) {
+        echo "Error checking subcategories: " . mysqli_error($conn);
+        return false;
+    }
+
+    $row = mysqli_fetch_row($result);
+    $count = $row[0];
+
+    return $count > 0;
+}
 
 
 function delete_forum_category_query()
@@ -151,17 +167,33 @@ function delete_forum_category_query()
     if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['deleteCategoryID'])) {
         $deleteCategoryID = $_POST['deleteCategoryID'];
 
-        // Delete category from the database
-        $deleteQuery = "DELETE FROM forum_categories WHERE category_id = '$deleteCategoryID'";
-        if (mysqli_query($conn, $deleteQuery)) {
-            // Redirect after successful category deletion
-            header("Location: admin_dashboard.php");
-            exit(); // Important to exit to prevent further execution
+        // Check if there are associated subcategories
+        $subcategoriesQuery = "SELECT COUNT(*) FROM subcategories WHERE category_id = '$deleteCategoryID'";
+        $subcategoriesResult = mysqli_query($conn, $subcategoriesQuery);
+
+        if (!$subcategoriesResult) {
+            echo "Error checking subcategories: " . mysqli_error($conn);
         } else {
-            echo "Error deleting category: " . mysqli_error($conn);
+            $subcategoriesCount = mysqli_fetch_assoc($subcategoriesResult)['COUNT(*)'];
+
+            if ($subcategoriesCount > 0) {
+                // Display a JavaScript alert
+                echo '<script>alert("Cannot delete this category. Remove associated subcategories first.");</script>';
+            } else {
+                // Delete the category from the database
+                $deleteQuery = "DELETE FROM forum_categories WHERE category_id = '$deleteCategoryID'";
+                if (mysqli_query($conn, $deleteQuery)) {
+                    // Redirect after successful category deletion
+                    header("Location: admin_dashboard.php");
+                    exit(); // Important to exit to prevent further execution
+                } else {
+                    echo "Error deleting category: " . mysqli_error($conn);
+                }
+            }
         }
     }
 }
+
 
 function add_new_forum_subcategory_query()
 {
