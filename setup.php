@@ -1,12 +1,11 @@
 <?php
 // Database configuration
 $dbHost = 'localhost';
-$dbUser = 'your_db_user';
-$dbPassword = 'your_db_password';
-$dbName = 'php_forum';
+$dbUser = 'root';
+$dbPassword = '';
 
-// Create a database connection
-$conn = new mysqli($dbHost, $dbUser, $dbPassword, $dbName);
+// Create a database connection to MySQL server
+$conn = new mysqli($dbHost, $dbUser, $dbPassword);
 
 // Check the connection
 if ($conn->connect_error) {
@@ -14,21 +13,59 @@ if ($conn->connect_error) {
 }
 
 // Create the database if it doesn't exist
-$sqlDb = "CREATE DATABASE IF NOT EXISTS $dbName";
-if ($conn->query($sqlDb) === TRUE) {
+$dbName = 'php_forum';
+$sqlCreateDb = "CREATE DATABASE IF NOT EXISTS $dbName";
+if ($conn->query($sqlCreateDb) === TRUE) {
     echo "Database created successfully";
 } else {
     echo "Error creating database: " . $conn->error;
 }
 
+// Close the connection to the MySQL server
+$conn->close();
 
-// SQL queries to create forum tables
+// Re-establish connection with the specified database
+$conn = new mysqli($dbHost, $dbUser, $dbPassword, $dbName);
+
+// Check the connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+
+// SQL query to create forums table
 $sqlForums = "CREATE TABLE IF NOT EXISTS forums (
     forum_id INT AUTO_INCREMENT PRIMARY KEY,
     category_id INT,
     forum_name VARCHAR(255),
     forum_permissions VARCHAR(255)
 )";
+
+// Execute the query to create the forums table
+if ($conn->query($sqlForums) === TRUE) {
+    // Check if the default forum already exists
+    $defaultForumName = "General"; // Change this to the default forum name
+    $sqlCheckForum = "SELECT * FROM forums WHERE forum_name = '$defaultForumName'";
+    $result = $conn->query($sqlCheckForum);
+
+    if ($result->num_rows == 0) {
+        // Insert default forum into the forums table
+        $sqlInsertForum = "INSERT INTO forums (category_id, forum_name, forum_permissions) VALUES (1, '$defaultForumName', 'default_permissions')";
+
+        // Execute the query to insert the default forum
+        if ($conn->query($sqlInsertForum) === TRUE) {
+            echo "Default forum added successfully";
+        } else {
+            echo "Error adding default forum: " . $conn->error;
+        }
+    } else {
+        echo "Default forum already exists";
+    }
+} else {
+    echo "Error creating forums table: " . $conn->error;
+}
+
+
 
 $sqlCategory = "CREATE TABLE IF NOT EXISTS category (
     category_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -70,20 +107,25 @@ $sqlUsers = "CREATE TABLE IF NOT EXISTS users (
     register_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 )";
 
-$sqlInsertAdmin = "INSERT INTO users (
-    username,
-     password,
-      userrole)
-       VALUES 
-       (
+if ($conn->query($sqlUsers) === TRUE) {
+    // Insert admin user after creating the users table
+    $sqlInsertAdmin = "INSERT INTO users (
+        username,
+        password,
+        userrole
+    ) VALUES (
         'admin',
-         'admin',
-          'administrator')";
+        'admin',
+        'administrator'
+    )";
 
-if (mysqli_query($conn, $sqlInsertAdmin)) {
-    echo "Admin user added successfully";
+    if (mysqli_query($conn, $sqlInsertAdmin)) {
+        echo "Admin user added successfully";
+    } else {
+        echo "Error adding admin user: " . mysqli_error($conn);
+    }
 } else {
-    echo "Error adding admin user: " . mysqli_error($conn);
+    echo "Error creating Users table: " . $conn->error . "<br>";
 }
 
 // Execute the queries
@@ -119,4 +161,3 @@ if ($conn->query($sqlUsers) === TRUE) {
 
 // Close the database connection
 $conn->close();
-?>

@@ -1,4 +1,5 @@
 <?php
+session_start();
 include_once(__DIR__ . "/../db/db_connect.php");
 
 // Function to handle user login
@@ -163,6 +164,7 @@ function hasSubcategories($categoryID) {
 function delete_forum_category_query()
 {
     global $conn;
+
     // Handle deleting category
     if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['deleteCategoryID'])) {
         $deleteCategoryID = $_POST['deleteCategoryID'];
@@ -177,8 +179,8 @@ function delete_forum_category_query()
             $subcategoriesCount = mysqli_fetch_assoc($subcategoriesResult)['COUNT(*)'];
 
             if ($subcategoriesCount > 0) {
-                // Display a JavaScript alert
-                echo '<script>alert("Cannot delete this category. Remove associated subcategories first.");</script>';
+                // Set a session variable to indicate that the action should trigger an alert
+                $_SESSION['show_alert'] = true;
             } else {
                 // Delete the category from the database
                 $deleteQuery = "DELETE FROM forum_categories WHERE category_id = '$deleteCategoryID'";
@@ -193,6 +195,14 @@ function delete_forum_category_query()
         }
     }
 }
+
+// Check if the session variable is set and display the alert accordingly
+if (isset($_SESSION['show_alert']) && $_SESSION['show_alert']) {
+    echo '<script>alert("Cannot delete this category. Remove associated subcategories first.");</script>';
+    // Reset the session variable
+    $_SESSION['show_alert'] = false;
+}
+
 
 
 function add_new_forum_subcategory_query()
