@@ -84,44 +84,45 @@
             width: 100%;
             bottom: 0;
         }
-                /* Dropdown styles */
-.dropdown {
-    margin-left: 70%;
-    /* float: right; */
-    position: relative;
-    display: inline-block;
-}
 
-.dropdown .dropbtn {
-    color: white;
-    text-decoration: none;
-    padding: 10px;
-    cursor: pointer;
-}
+        /* Dropdown styles */
+        .dropdown {
+            margin-left: 70%;
+            /* float: right; */
+            position: relative;
+            display: inline-block;
+        }
 
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #444;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-}
+        .dropdown .dropbtn {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            cursor: pointer;
+        }
 
-.dropdown-content a {
-    color: white;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-}
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #444;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
 
-.dropdown-content a:hover {
-    background-color: #333;
-}
+        .dropdown-content a {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
 
-.dropdown:hover .dropdown-content {
-    display: block;
-}
+        .dropdown-content a:hover {
+            background-color: #333;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
     </style>
 </head>
 
@@ -135,24 +136,24 @@
         <a href="forums.php">Forums</a>
         <a href="#">Members</a>
         <div class="dropdown">
-        <?php
-        // Display login or logout link based on session status
-        if (isset($_SESSION['username']) ) {
-            $username = $_SESSION['username'];
-            echo '<span class="dropbtn">' . $username . '</span>';
-            echo '<div class="dropdown-content">';
-            echo '<a href="includes/myaccount.php">My Account</a>';
-            if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'administrator') {
-                echo "<a href='../../admin/admin_dashboard.php'>Admin</a>";
+            <?php
+            // Display login or logout link based on session status
+            if (isset($_SESSION['username'])) {
+                $username = $_SESSION['username'];
+                echo '<span class="dropbtn">' . $username . '</span>';
+                echo '<div class="dropdown-content">';
+                echo '<a href="includes/myaccount.php">My Account</a>';
+                if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'administrator') {
+                    echo "<a href='../../admin/admin_dashboard.php'>Admin</a>";
+                }
+                echo '<a href="../../includes/logout.php">Logout</a>';
+                echo '</div>';
+            } else {
+                echo '<a id="loginLink" style="cursor: pointer;">Login</a>';
+                echo "<a href='Registration_form.php'>Register</a>";
             }
-            echo '<a href="../../includes/logout.php">Logout</a>';
-            echo '</div>';
-        } else {
-            echo '<a id="loginLink" style="cursor: pointer;">Login</a>';
-            echo "<a href='Registration_form.php'>Register</a>";
-        }
-        ?>
-        
+            ?>
+
     </nav>
 
     <div class="container">
@@ -165,25 +166,25 @@
             $result = mysqli_query($conn, $query);
 
             // Display forum categories and sub-forums
-while ($row = mysqli_fetch_assoc($result)) {
-    echo '<div class="category">';
-    echo '<h2>' . $row['category_name'] . '</h2>';
-    
-    // Fetch sub-forums for this category
-    $subforumQuery = "SELECT * FROM forums WHERE category_id = {$row['category_id']}";
-    $subforumResult = mysqli_query($conn, $subforumQuery);
-    
-    echo '<ul class="subforum-list">';
-    while ($subforumRow = mysqli_fetch_assoc($subforumResult)) {
-        echo '<li class="subforum-item">';
-        echo '<a href="subforum.php?subforum_id=' . $subforumRow['forum_id'] . '">' . $subforumRow['forum_name'] . '</a>';
-        echo '</li>';
-    }
-    echo '</ul>';
-    
-    echo '</div>';
-}
-?>
+            while ($row = mysqli_fetch_assoc($result)) {
+                echo '<div class="category">';
+                echo '<h2>' . $row['category_name'] . '</h2>';
+
+                // Fetch sub-forums for this category
+                $subforumQuery = "SELECT * FROM forums WHERE category_id = {$row['category_id']}";
+                $subforumResult = mysqli_query($conn, $subforumQuery);
+
+                echo '<ul class="subforum-list">';
+                while ($subforumRow = mysqli_fetch_assoc($subforumResult)) {
+                    echo '<li class="subforum-item">';
+                    echo '<a href="subforum.php?subforum_id=' . $subforumRow['forum_id'] . '">' . $subforumRow['forum_name'] . '</a>';
+                    echo '</li>';
+                }
+                echo '</ul>';
+
+                echo '</div>';
+            }
+            ?>
 
         </div>
 

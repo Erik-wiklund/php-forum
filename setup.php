@@ -16,7 +16,11 @@ if ($conn->connect_error) {
 $dbName = 'php_forum';
 $sqlCreateDb = "CREATE DATABASE IF NOT EXISTS $dbName";
 if ($conn->query($sqlCreateDb) === TRUE) {
-    echo "Database created successfully";
+    if (mysqli_affected_rows($conn) > 0) {
+        echo "Database created successfully" . "<br>";
+    } else {
+        echo "Database already exist" . "<br>";
+    }
 } else {
     echo "Error creating database: " . $conn->error;
 }
@@ -43,31 +47,25 @@ $sqlForums = "CREATE TABLE IF NOT EXISTS forums (
 
 // Execute the query to create the forums table
 if ($conn->query($sqlForums) === TRUE) {
-    // Check if the default forum already exists
-    $defaultForumName = "General"; // Change this to the default forum name
+    $defaultForumName = "General";
     $sqlCheckForum = "SELECT * FROM forums WHERE forum_name = '$defaultForumName'";
     $result = $conn->query($sqlCheckForum);
 
     if ($result->num_rows == 0) {
-        // Insert default forum into the forums table
         $sqlInsertForum = "INSERT INTO forums (category_id, forum_name, forum_permissions) VALUES (1, '$defaultForumName', 'default_permissions')";
-
-        // Execute the query to insert the default forum
         if ($conn->query($sqlInsertForum) === TRUE) {
-            echo "Default forum added successfully";
+            echo "Default forum added successfully" . "<br>";
         } else {
             echo "Error adding default forum: " . $conn->error;
         }
     } else {
-        echo "Default forum already exists";
+        echo "Default forum already exists" . "<br>";
     }
 } else {
     echo "Error creating forums table: " . $conn->error;
 }
 
-
-
-$sqlCategory = "CREATE TABLE IF NOT EXISTS category (
+$sqlCategory = "CREATE TABLE IF NOT EXISTS forum_categories (
     category_id INT AUTO_INCREMENT PRIMARY KEY,
     category_name VARCHAR(255) NOT NULL
 )";
@@ -108,29 +106,49 @@ $sqlUsers = "CREATE TABLE IF NOT EXISTS users (
 )";
 
 if ($conn->query($sqlUsers) === TRUE) {
-    // Insert admin user after creating the users table
-    $sqlInsertAdmin = "INSERT INTO users (
-        username,
-        password,
-        userrole
-    ) VALUES (
-        'admin',
-        'admin',
-        'administrator'
-    )";
+    // Check if admin user already exists
+    $sqlCheckAdmin = "SELECT COUNT(*) as count FROM users WHERE username = 'admin'";
+    $result = $conn->query($sqlCheckAdmin);
 
-    if (mysqli_query($conn, $sqlInsertAdmin)) {
-        echo "Admin user added successfully";
+    if ($result && $result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $adminCount = $row['count'];
+
+        if ($adminCount == 0) {
+            $password = 'password';
+            $hashedPassword = password_hash($password, PASSWORD_BCRYPT, ['cost' => 10]);
+            $sqlInsertAdmin = "INSERT INTO users (
+                username,
+                password,
+                userrole
+            ) VALUES (
+                'admin',
+                '$hashedPassword',
+                'administrator'
+            )";
+
+            if (mysqli_query($conn, $sqlInsertAdmin)) {
+                echo "Admin user added successfully" . "<br>";
+            } else {
+                echo "Error adding admin user: " . mysqli_error($conn);
+            }
+        } else {
+            echo "Admin user already exists" . "<br>";
+        }
     } else {
-        echo "Error adding admin user: " . mysqli_error($conn);
+        echo "Error checking for existing admin user: " . $conn->error . "<br>";
     }
 } else {
     echo "Error creating Users table: " . $conn->error . "<br>";
 }
 
-// Execute the queries
+
 if ($conn->query($sqlForums) === TRUE) {
-    echo "Forums table created successfully<br>";
+    if (mysqli_affected_rows($conn) > 0) {
+        echo "Forums table created successfully<br>";
+    } else {
+        echo "Forums Table already exist" . "<br>";
+    }
 } else {
     echo "Error creating Forums table: " . $conn->error . "<br>";
 }
