@@ -143,7 +143,8 @@ function edit_forum_category($categoryId)
 
 
 
-function hasSubcategories($categoryID) {
+function hasSubcategories($categoryID)
+{
     global $conn;
 
     $query = "SELECT COUNT(*) FROM subcategories WHERE category_id = '$categoryID'";
@@ -263,7 +264,7 @@ function add_new_category_modal()
                 <label for="categoryOrder">Category Order:</label>
                 <input type="number" name="categoryOrder">
                 <button class="button" type="submit">Add</button>
-                <button class="button" onclick="closeModal('addCategoryModal')">Cancel</button>
+                <button class="button" type="button" onclick="closeModal('addCategoryModal')">Cancel</button>
             </form>
         </div>
     </div>

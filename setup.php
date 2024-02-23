@@ -67,13 +67,15 @@ if ($conn->query($sqlForums) === TRUE) {
 
 $sqlCategory = "CREATE TABLE IF NOT EXISTS forum_categories (
     category_id INT AUTO_INCREMENT PRIMARY KEY,
-    category_name VARCHAR(255) NOT NULL
+    category_name VARCHAR(255) NOT NULL,
+    category_order INT 
 )";
 
-$sqlSub_categories = "CREATE TABLE subcategories (
+$sqlSub_categories = "CREATE TABLE IF NOT EXISTS subcategories (
     subcategory_id INT AUTO_INCREMENT PRIMARY KEY,
     subcategory_name VARCHAR(255) NOT NULL,
     category_id INT NOT NULL,
+    subcategory_order INT,
     FOREIGN KEY (category_id) REFERENCES forum_categories(category_id)
 )";
 
@@ -157,6 +159,12 @@ if ($conn->query($sqlCategory) === TRUE) {
     echo "Category table created successfully<br>";
 } else {
     echo "Error creating Category table: " . $conn->error . "<br>";
+}
+
+if ($conn->query($sqlSub_categories) === TRUE) {
+    echo "Sub Category table created successfully<br>";
+} else {
+    echo "Error creating Sub Category table: " . $conn->error . "<br>";
 }
 
 if ($conn->query($sqlReplies) === TRUE) {

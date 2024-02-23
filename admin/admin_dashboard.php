@@ -103,7 +103,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['deleteUserID'])) {
             // Fetch and display categories from the database
             $categoryQuery = "SELECT * FROM forum_categories ORDER BY category_order";
             $categoryResult = mysqli_query($conn, $categoryQuery);
-
+            add_new_category_modal();
+            add_new_subcategory_modal();
             while ($categoryRow = mysqli_fetch_assoc($categoryResult)) {
                 echo '<tr>';
                 echo '<td>' . $categoryRow['category_name'] . '</td>';
@@ -114,7 +115,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['deleteUserID'])) {
                 WHERE cat.category_id = " . $categoryRow['category_id'] . "
                 ORDER BY sub.subcategory_order";
                 $subcategoryResult = mysqli_query($conn, $subcategoryQuery);
-                add_new_category_modal();
+
                 while ($subcategoryRow = mysqli_fetch_assoc($subcategoryResult)) {
                     echo '<div>';
                     echo '&emsp;&emsp;' . $subcategoryRow['subcategory_name'];
@@ -123,7 +124,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['deleteUserID'])) {
                     echo '<button class="button" type="button" onclick="showModal(\'editSubcategoryModal' . $subcategoryRow['subcategory_id'] .  '\')">Edit</button>';
                     echo '<button class="button" type="button" onclick="showModal(\'deleteSubcategoryModal' . $subcategoryRow['subcategory_id'] . '\')">Delete</button>';
                     echo '</div>';
-                    add_new_subcategory_modal();
                 }
                 delete_subcategory_modal();
                 delete_forum_category_modal();
