@@ -89,7 +89,7 @@
 
     <div class="container">
         <?php if (isset($_SESSION['ID'])) : ?>
-            <a href="create_thread.php" class="create-thread-button">Create New Thread</a>
+            <a href="create_thread.php?subcategory_id=<?php echo isset($_GET['subcategory_id']) ? $_GET['subcategory_id'] : ''; ?>" class="create-thread-button">Create New Thread</a>
         <?php else : ?>
             <a href="registration_form.php" class="create-thread-button">Signup</a>
         <?php endif; ?>
@@ -103,7 +103,7 @@
             global $conn;
             $query = "SELECT threads.*, users.username 
             FROM threads
-            INNER JOIN users ON threads.user_id = users.id";
+            INNER JOIN users ON threads.creator_id = creator_id";
             $result = mysqli_query($conn, $query);
 
             // Display threads

@@ -59,22 +59,49 @@ function login_user($username, $password)
 function add_new_forum_category_query()
 {
     global $conn;
+
     // Handle adding new category
     if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['categoryName'])) {
         $categoryName = $_POST['categoryName'];
         $categoryOrder = $_POST['categoryOrder'];
 
-        // Insert category into the database
-        $insertQuery = "INSERT INTO forum_categories (category_name,category_order) VALUES ('$categoryName', '$categoryOrder')";
-        if (mysqli_query($conn, $insertQuery)) {
-            // Redirect after successful category addition
-            header("Location: admin_dashboard.php");
-            exit(); // Important to exit to prevent further execution
+        // Query to get the forum ID (assuming there's only one forum)
+        $sqlGetForumId = "SELECT forum_id FROM forums LIMIT 1";
+        $result = mysqli_query($conn, $sqlGetForumId);
+
+        if ($result && mysqli_num_rows($result) > 0) {
+            $row = mysqli_fetch_assoc($result);
+            $forumId = $row['forum_id'];
+
+            // Prepare and bind the INSERT statement
+            $insertQuery = "INSERT INTO forum_categories (category_name, category_order, forum_id) VALUES (?, ?, ?)";
+            $stmt = mysqli_prepare($conn, $insertQuery);
+
+            // Check if the statement preparation succeeded
+            if ($stmt) {
+                // Bind parameters to the prepared statement
+                mysqli_stmt_bind_param($stmt, "ssi", $categoryName, $categoryOrder, $forumId);
+
+                // Execute the prepared statement
+                if (mysqli_stmt_execute($stmt)) {
+                    // Redirect after successful category addition
+                    header("Location: admin_dashboard.php");
+                    exit(); // Important to exit to prevent further execution
+                } else {
+                    echo "Error executing prepared statement: " . mysqli_stmt_error($stmt);
+                }
+
+                // Close the statement
+                mysqli_stmt_close($stmt);
+            } else {
+                echo "Error preparing statement: " . mysqli_error($conn);
+            }
         } else {
-            echo "Error adding category: " . mysqli_error($conn);
+            echo "No forum found.";
         }
     }
 }
+
 
 
 

@@ -1,10 +1,11 @@
-
-<?php session_start(); ?>
-<?php include_once(__DIR__ . "../../../db/db_connect.php"); ?>
-
+<?php
+session_start();
+include_once(__DIR__ . "/../../db/db_connect.php"); // Adjust the path as necessary
+?>
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Create New Thread - My Basic Website</title>
     <style>
@@ -83,47 +84,49 @@
         /* ... */
     </style>
 </head>
+
 <body>
     <header>
         <h1>Create New Thread - My Basic Website</h1>
     </header>
 
     <nav>
-        <?php if (isset($_SESSION['ID'])): ?>
-        <!-- Navigation links for logged-in users -->
-        <a href="#">Home</a>
-        <a href="#">Forums</a>
-        <a href="#">Members</a>
-        <a href="logout.php">Log Out</a>
-        <?php else: ?>
-        <!-- Navigation links for users not logged in -->
-        <a href="#">Home</a>
-        <a href="#">Forums</a>
-        <a href="#">Members</a>
-        <a href="signup.php">Sign Up</a>
-        <a href="login.php">Log In</a>
+        <?php if (isset($_SESSION['ID'])) : ?>
+            <!-- Navigation links for logged-in users -->
+            <a href="#">Home</a>
+            <a href="#">Forums</a>
+            <a href="#">Members</a>
+            <a href="logout.php">Log Out</a>
+        <?php else : ?>
+            <!-- Navigation links for users not logged in -->
+            <a href="#">Home</a>
+            <a href="#">Forums</a>
+            <a href="#">Members</a>
+            <a href="signup.php">Sign Up</a>
+            <a href="login.php">Log In</a>
         <?php endif; ?>
     </nav>
 
     <div class="container">
-        <?php if (isset($_SESSION['ID'])): ?>
-        <h2>Fill in the details to create a new thread</h2>
-        <form class="create-thread-form" action="process_create_thread.php" method="post">
-            <label for="threadTitle">Thread Title:</label>
-            <input type="text" id="threadTitle" name="threadTitle" required>
+        <?php if (isset($_SESSION['ID'])) : ?>
+            <h2>Fill in the details to create a new thread</h2>
+            <form class="create-thread-form" action="process_create_thread.php" method="post">
+                <label for="threadTitle">Thread Title:</label>
+                <input type="text" id="threadTitle" name="threadTitle" required>
 
-            <label for="threadContent">Thread Content:</label>
-            <textarea id="threadContent" name="threadContent" rows="6" required></textarea>
+                <label for="threadContent">Thread Content:</label>
+                <textarea id="threadContent" name="threadContent" rows="6" required></textarea>
 
-            <label>
-                <input type="checkbox" id="stickyThread" name="stickyThread">
-                Sticky Thread
-            </label>
+                <label>
+                    <input type="checkbox" id="stickyThread" name="stickyThread">
+                    Sticky Thread
+                </label>
+                <input type="hidden" id="subcategory_id" name="subcategory_id" value="<?php echo isset($_GET['subcategory_id']) ? $_GET['subcategory_id'] : ''; ?>">
 
-            <button class="create-thread-button" type="submit">Create Thread</button>
-        </form>
-        <?php else: ?>
-        <p>Please log in to create a new thread.</p>
+                <button class="create-thread-button" type="submit">Create Thread</button>
+            </form>
+        <?php else : ?>
+            <p>Please log in to create a new thread.</p>
         <?php endif; ?>
     </div>
 
@@ -131,4 +134,5 @@
         &copy; <?php echo date("Y"); ?> Create New Thread - My Basic Website. All rights reserved.
     </footer>
 </body>
+
 </html>

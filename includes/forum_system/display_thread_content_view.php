@@ -123,7 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 
 <body>
-<form action="" method='post'>
+    <form action="" method='post'>
         <!-- "Select All" container -->
         <div id="selectAllContainer">
             <div>
@@ -138,14 +138,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <label for="selectAllBoxes">Select All</label>
             </div>
         </div>
-        
+
         <!-- Your table content here -->
         <table class="table table-bordered table-hover">
             <tbody>
                 <?php
                 $query = "SELECT threads.*, users.username 
                 FROM threads
-                INNER JOIN users ON threads.user_id = users.id
+                INNER JOIN users ON threads.creator_id = users.id
                 ORDER BY threads.thread_id ASC";
                 $select_posts = mysqli_query($conn, $query);
 
@@ -268,24 +268,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<script>
-    $(document).ready(function(){
-        // Check/uncheck all checkboxes when "Select All" is clicked
-        $('#selectAllBoxes').click(function(event) {
-            if (this.checked) {
-                $('.checkBoxes').each(function(){
-                    this.checked = true;
-                });
-            } else {
-                $('.checkBoxes').each(function(){
-                    this.checked = false;
-                });
-            }
-        });
+    <script>
+        $(document).ready(function() {
+            // Check/uncheck all checkboxes when "Select All" is clicked
+            $('#selectAllBoxes').click(function(event) {
+                if (this.checked) {
+                    $('.checkBoxes').each(function() {
+                        this.checked = true;
+                    });
+                } else {
+                    $('.checkBoxes').each(function() {
+                        this.checked = false;
+                    });
+                }
+            });
 
-        // Other jQuery code goes here...
-    });
-</script>
+            // Other jQuery code goes here...
+        });
+    </script>
 </body>
 
 </html>

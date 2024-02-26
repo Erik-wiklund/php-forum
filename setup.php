@@ -40,7 +40,6 @@ if ($conn->connect_error) {
 // SQL query to create forums table
 $sqlForums = "CREATE TABLE IF NOT EXISTS forums (
     forum_id INT AUTO_INCREMENT PRIMARY KEY,
-    category_id INT,
     forum_name VARCHAR(255),
     forum_permissions VARCHAR(255)
 )";
@@ -52,7 +51,7 @@ if ($conn->query($sqlForums) === TRUE) {
     $result = $conn->query($sqlCheckForum);
 
     if ($result->num_rows == 0) {
-        $sqlInsertForum = "INSERT INTO forums (category_id, forum_name, forum_permissions) VALUES (1, '$defaultForumName', 'default_permissions')";
+        $sqlInsertForum = "INSERT INTO forums ( forum_name, forum_permissions) VALUES ( '$defaultForumName', 'default_permissions')";
         if ($conn->query($sqlInsertForum) === TRUE) {
             echo "Default forum added successfully" . "<br>";
         } else {
@@ -68,7 +67,9 @@ if ($conn->query($sqlForums) === TRUE) {
 $sqlCategory = "CREATE TABLE IF NOT EXISTS forum_categories (
     category_id INT AUTO_INCREMENT PRIMARY KEY,
     category_name VARCHAR(255) NOT NULL,
-    category_order INT 
+    category_order INT,
+    forum_id INT,
+    FOREIGN KEY (forum_id) REFERENCES forums(forum_id)
 )";
 
 $sqlSub_categories = "CREATE TABLE IF NOT EXISTS subcategories (
@@ -91,10 +92,12 @@ $sqlThreads = "CREATE TABLE IF NOT EXISTS threads (
     thread_id INT AUTO_INCREMENT PRIMARY KEY,
     thread_title VARCHAR(255) NOT NULL,
     thread_content TEXT NOT NULL,
-    forum_id INT NOT NULL,
-    user_id INT NOT NULL,
+    creator_id INT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    sticky TINYINT NOT NULL DEFAULT 0
+    sticky TINYINT NOT NULL DEFAULT 0,
+    subcategory_id INT NOT NULL,
+    FOREIGN KEY (subcategory_id) REFERENCES subcategories(subcategory_id),
+    FOREIGN KEY (creator_id) REFERENCES users(ID)
 )";
 
 $sqlUsers = "CREATE TABLE IF NOT EXISTS users (

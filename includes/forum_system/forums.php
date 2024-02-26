@@ -171,13 +171,13 @@
                 echo '<h2>' . $row['category_name'] . '</h2>';
 
                 // Fetch sub-forums for this category
-                $subforumQuery = "SELECT * FROM forums WHERE category_id = {$row['category_id']}";
+                $subforumQuery = "SELECT * FROM subcategories WHERE category_id = {$row['category_id']}";
                 $subforumResult = mysqli_query($conn, $subforumQuery);
 
                 echo '<ul class="subforum-list">';
                 while ($subforumRow = mysqli_fetch_assoc($subforumResult)) {
                     echo '<li class="subforum-item">';
-                    echo '<a href="subforum.php?subforum_id=' . $subforumRow['forum_id'] . '">' . $subforumRow['forum_name'] . '</a>';
+                    echo '<a href="subforum.php?subcategory_id=' . $subforumRow['subcategory_id'] . '">' . $subforumRow['subcategory_name'] . '</a>';
                     echo '</li>';
                 }
                 echo '</ul>';
